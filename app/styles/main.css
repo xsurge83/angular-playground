@@ -84,9 +84,9 @@ body {
     }
 }
 
-
 .tabs {
-    padding-top: 14px
+    padding-top: 14px;
+    display: block;
 }
 
 .tabs ul {
@@ -98,7 +98,7 @@ body {
     margin-left: 16px;
 }
 
-.tabs ul li {
+ .tabs > li {
     float: left;
     width: 100px
 }
@@ -118,14 +118,14 @@ body {
 
 .tab-content {
     height: 500px;
-    padding-top: 50px;
     position: relative;
     top: 0px;
     overflow: hidden;
+    clear: both;
 }
 
 .tab-content > .tab-pane{
- display: inline;
+ display: inline-block;
 }
 
 .tab-pane {

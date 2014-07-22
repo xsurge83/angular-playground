@@ -6,29 +6,32 @@
  * @description
  * # tabs
  */
-angular.module('myAngularAppApp')
+angular.module('myAngularAppApp.directives.tabs', [])
     .directive('myTabs', function() {
         return {
             restrict: 'E',
             transclude: true,
             scope: {},
             controller: function($scope) {
-                var panes = $scope.panes = [];
+                var _panes = $scope.panes = [],
+                    _currentIndex = 0;
                     $scope.direction = 'go-right';
                 $scope.select = function(pane) {
 
-                    $scope.direction = $scope.direction === 'go-right' ? 'go-left' : 'go-right';
-                    angular.forEach(panes, function(pane) {
+                    var selectedIndex = _panes.indexOf(pane);
+                    $scope.direction = selectedIndex < _currentIndex ? 'go-right' : 'go-left';
+                    angular.forEach(_panes, function(pane) {
                         pane.selected = false;
                     });
                     pane.selected = true;
+                    _currentIndex = selectedIndex;
                 };
 
                 this.addPane = function(pane) {
-                    if (panes.length === 0) {
+                    if (_panes.length === 0) {
                         $scope.select(pane);
                     }
-                    panes.push(pane);
+                    _panes.push(pane);
                 };
             },
             templateUrl: 'views/tabs/my-tabs.html'

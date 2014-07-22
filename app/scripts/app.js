@@ -15,7 +15,8 @@ angular
     'ngResource',
     'ngRoute',
     'ngSanitize',
-    'ngTouch'
+    'ngTouch',
+     'myAngularAppApp.directives.tabs'
   ])
   .config(function ($routeProvider) {
     $routeProvider
