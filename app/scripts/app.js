@@ -9,14 +9,14 @@
  * Main module of the application.
  */
 angular
-  .module('myAngularAppApp', [
+  .module('myAngularApp', [
     'ngAnimate',
     'ngCookies',
     'ngResource',
     'ngRoute',
     'ngSanitize',
     'ngTouch',
-     'myAngularAppApp.directives.tabs'
+     'myAngularApp.directives.tabs'
   ])
   .config(function ($routeProvider) {
     $routeProvider
