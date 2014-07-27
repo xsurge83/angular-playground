@@ -7,7 +7,9 @@
  * # tabs
  */
 angular.module('myAngularApp.directives.tabs', [])
-  .directive('myTabs', function ($swipe) {
+  .directive('myTabs', function ($swipe, $window) {
+    var requestAnimationFrame = $window.requestAnimationFrame || $window.webkitRequestAnimationFrame || $window.mozRequestAnimationFrame;
+
     return {
       restrict: 'E',
       transclude: true,
@@ -53,6 +55,55 @@ angular.module('myAngularApp.directives.tabs', [])
           }
           _panes.push(pane);
         };
+      },
+      link : function(scope, element){
+        var offset = 0,
+          startX,
+          swipeMoved;
+        function scroll(x) {
+          // use CSS 3D transform to move the carousel
+          if (isNaN(x)) {
+            x = scope.carouselIndex * containerWidth;
+          }
+
+          offset = x;
+          var move = -Math.round(offset);
+          move += (scope.carouselBufferIndex * containerWidth);
+
+          if(!is3dAvailable) {
+            element[0].style[transformProperty] = 'translate(' + move + 'px, 0)';
+          } else {
+            element[0].style[transformProperty] = 'translate3d(' + move + 'px, 0, 0)';
+          }
+        }
+
+        function swipeMove(coords, event) {
+          //console.log('swipeMove', coords, event);
+          var x, delta;
+          if (pressed) {
+            x = coords.x;
+            delta = startX - x;
+            if (delta > 2 || delta < -2) {
+              swipeMoved = true;
+              startX = x;
+
+              /* We are using raf.js, a requestAnimationFrame polyfill, so
+               this will work on IE9 */
+              requestAnimationFrame(function() {
+                scroll(capPosition(offset + delta));
+              });
+            }
+          }
+          return false;
+        }
+
+
+
+
+        $swipe.bind(element, {
+
+        })
+
       },
       templateUrl: 'views/tabs/my-tabs.html'
     };
