@@ -1,115 +1,104 @@
 'use strict';
+(function (angular) {
 
-/**
- * @ngdoc directive
- * @name myAngularAppApp.directive:tabs
- * @description
- * # tabs
- */
-angular.module('myAngularApp.directives.navSwipe', [])
+  function NavSwipeCtrl($scope) {
+    var _panes = $scope.panes = [],
+      _currentIndex = 0;
+    $scope.direction = 'go-right';
 
-  .directive('navSwipe', function ($swipe, $window) {
-    var requestAnimationFrame = $window.requestAnimationFrame || $window.webkitRequestAnimationFrame || $window.mozRequestAnimationFrame;
+    /***
+     *
+     * @param {Object|number} pane
+     */
+    $scope.select = function (pane) {
+      var selectedIndex;
+      if (angular.isNumber(pane)) {
+        pane = _panes[pane];
+      }
+      if (pane) {
+        selectedIndex = _panes.indexOf(pane);
+        $scope.direction = selectedIndex < _currentIndex ? 'go-right' : 'go-left';
 
+        angular.forEach(_panes, function (pane) {
+          pane.selected = false;
+        });
+
+        pane.selected = true;
+        _currentIndex = selectedIndex;
+      }
+    };
+
+    $scope.swipeLeft = function () {
+      $scope.select(_currentIndex + 1)
+    };
+
+    $scope.swipeRight = function () {
+      $scope.select(_currentIndex - 1);
+    };
+
+    this.addPane = function (pane) {
+      if (_panes.length === 0) {
+        $scope.select(pane);
+      }
+      _panes.push(pane);
+    };
+  }
+
+  function navSwipeDirective($swipe) {
     return {
       restrict: 'E',
       transclude: true,
       scope: {},
-      controller: function ($scope) {
-        var _panes = $scope.panes = [],
-          _currentIndex = 0;
-        $scope.direction = 'go-right';
+      controller: 'NavSwipeCtrl',
+      link: function (scope, element) {
 
-        /***
-         *
-         * @param {Object|number} pane
-         */
-        $scope.select = function (pane) {
-          var selectedIndex;
-          if (angular.isNumber(pane)) {
-            pane = _panes[pane];
-          }
-          if (pane) {
-            selectedIndex = _panes.indexOf(pane);
-            $scope.direction = selectedIndex < _currentIndex ? 'go-right' : 'go-left';
+        var startX = 0, offsetX = 0;
+        var $swipeContentUl = element.find('.swipe-content-list');
 
-            angular.forEach(_panes, function (pane) {
-              pane.selected = false;
-            });
-
-            pane.selected = true;
-            _currentIndex = selectedIndex;
-          }
-        };
-
-        $scope.swipeLeft = function () {
-          $scope.select(_currentIndex + 1)
-        };
-
-        $scope.swipeRight = function () {
-          $scope.select(_currentIndex - 1);
-        };
-
-        this.addPane = function (pane) {
-          if (_panes.length === 0) {
-            $scope.select(pane);
-          }
-          _panes.push(pane);
-        };
-      },
-      link : function(scope, element){
-        var offset = 0,
-          startX,
-          swipeMoved;
-        function scroll(x) {
-          // use CSS 3D transform to move the carousel
-          if (isNaN(x)) {
-            x = scope.carouselIndex * containerWidth;
-          }
-
-          offset = x;
-          var move = -Math.round(offset);
-          move += (scope.carouselBufferIndex * containerWidth);
-
-          if(!is3dAvailable) {
-            element[0].style[transformProperty] = 'translate(' + move + 'px, 0)';
-          } else {
-            element[0].style[transformProperty] = 'translate3d(' + move + 'px, 0, 0)';
+        function swipeStart(coords) {
+          if (!startX) {
+            startX = coords.x;
           }
         }
 
-        function swipeMove(coords, event) {
-          //console.log('swipeMove', coords, event);
-          var x, delta;
-          if (pressed) {
-            x = coords.x;
-            delta = startX - x;
-            if (delta > 2 || delta < -2) {
-              swipeMoved = true;
-              startX = x;
-
-              /* We are using raf.js, a requestAnimationFrame polyfill, so
-               this will work on IE9 */
-              requestAnimationFrame(function() {
-                scroll(capPosition(offset + delta));
-              });
-            }
-          }
-          return false;
+        function swipeEnd(coords) {
+          console.log('end ' + coords.x);
+          startX = 0;
+          // todo: finish
         }
 
+        function swipeMove(coords) {
+          var delta = coords.x - startX;
+          if (delta > 2 || delta < -2) {
+            startX = coords.x;
+            offsetX += delta;
+            console.log('delta ' + delta);
 
+            $swipeContentUl
+              .velocity(
+              { translateX: offsetX},
+              10,
+              "ease"
+            );
+          }
 
+        }
 
-        $swipe.bind(element, {
-
-        })
+        $swipe.bind($swipeContentUl, {
+          start: swipeStart,
+          move: swipeMove,
+          end: swipeEnd,
+          cancel: function (event) {
+            swipeEnd({}, event);
+          }
+        });
 
       },
       templateUrl: '../../../views/navSwipe/nav-swipe.html'
     };
-  })
-  .directive('swipeContent', function () {
+  }
+
+  function swipeContentDirective() {
     return {
       require: '^navSwipe',
       restrict: 'E',
@@ -123,5 +112,20 @@ angular.module('myAngularApp.directives.navSwipe', [])
       },
       templateUrl: '../../../views/navSwipe/swipe-content.html'
     };
-  });
+  }
 
+  /**
+   * @ngdoc directive
+   * @name myAngularAppApp.directives.navSwipe
+   * @description
+   *
+   */
+  angular.module('myAngularApp.directives.navSwipe', [])
+
+    .controller('NavSwipeCtrl', ['$scope', NavSwipeCtrl])
+
+    .directive('navSwipe', ['$swipe', navSwipeDirective])
+
+    .directive('swipeContent', swipeContentDirective);
+
+})(angular);
