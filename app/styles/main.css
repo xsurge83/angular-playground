@@ -84,6 +84,8 @@ body {
     }
 }
 
+
+/* Navigations  */
 .tabs {
     padding-top: 14px;
     display: block;
@@ -92,13 +94,11 @@ body {
 .tabs ul {
     list-style: none;
     margin: 0;
-    width: 100%;
     overflow: hidden;
-    padding: 0;
     margin-left: 16px;
 }
 
- .tabs > li {
+.tabs > li {
     float: left;
     width: 100px
 }
@@ -116,7 +116,9 @@ body {
     overflow: hidden;
 }
 
-.tab-content {
+
+
+.content-container {
     height: 500px;
     position: relative;
     top: 0px;
@@ -124,20 +126,28 @@ body {
     clear: both;
 }
 
-.tab-content > .tab-pane{
- display: inline-block;
+.content-container > .content-pane{
+    display: inline;
 }
 
-.tab-pane {
+.content-list {
+    position: relative;
+    white-space: nowrap;
+    overflow: visible;
+    padding: 0;
+    margin: 0;
+}
+
+.content-pane {
     background: white;
     width: 100%;
     padding-bottom: 30px;
     margin: 0 auto;
     left: 0px;
     border:1px solid black;
-    position: absolute;
-    float: left;
+    position: relative;
     height: 400px;
+    display: inline-block;
 }
 
 /* change go-right to slide */
@@ -146,11 +156,11 @@ body {
 }
 
 .go-right > .tab-pane.ng-hide-remove.ng-hide-remove-active{
-  left: 0px;
+    left: 0px;
 }
 
 .go-right > .tab-pane.ng-hide-add.ng-hide-add-active{
-   left: 100%;
+    left: 100%;
 }
 
 .go-left > .tab-pane.ng-hide-remove{
@@ -166,7 +176,6 @@ body {
 }
 
 .tab-pane.ng-hide-remove, .tab-pane.ng-hide-add {
-    -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) .5s;
     transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) .5s;
     display: block !important;
 }
