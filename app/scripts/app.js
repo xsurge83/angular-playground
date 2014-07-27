@@ -16,7 +16,7 @@ angular
     'ngRoute',
     'ngSanitize',
     'ngTouch',
-     'myAngularApp.directives.tabs'
+     'myAngularApp.directives.navSwipe'
   ])
   .config(function ($routeProvider) {
     $routeProvider

@@ -6,8 +6,9 @@
  * @description
  * # tabs
  */
-angular.module('myAngularApp.directives.tabs', [])
-  .directive('myTabs', function ($swipe, $window) {
+angular.module('myAngularApp.directives.navSwipe', [])
+
+  .directive('navSwipe', function ($swipe, $window) {
     var requestAnimationFrame = $window.requestAnimationFrame || $window.webkitRequestAnimationFrame || $window.mozRequestAnimationFrame;
 
     return {
@@ -105,22 +106,22 @@ angular.module('myAngularApp.directives.tabs', [])
         })
 
       },
-      templateUrl: 'views/tabs/my-tabs.html'
+      templateUrl: '../../../views/navSwipe/nav-swipe.html'
     };
   })
-  .directive('myPane', function () {
+  .directive('swipeContent', function () {
     return {
-      require: '^myTabs',
+      require: '^navSwipe',
       restrict: 'E',
       transclude: true,
       replace: true,
       scope: {
         title: '@'
       },
-      link: function (scope, element, attrs, tabsCtrl) {
-        tabsCtrl.addPane(scope);
+      link: function (scope, element, attrs, navSwipeCtrl) {
+        navSwipeCtrl.addPane(scope);
       },
-      templateUrl: 'views/tabs/my-pane.html'
+      templateUrl: '../../../views/navSwipe/swipe-content.html'
     };
   });
 

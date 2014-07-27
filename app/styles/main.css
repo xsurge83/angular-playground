@@ -118,7 +118,7 @@ body {
 
 
 
-.content-container {
+.swipe-content-container {
     height: 500px;
     position: relative;
     top: 0px;
@@ -126,11 +126,11 @@ body {
     clear: both;
 }
 
-.content-container > .content-pane{
+.swipe-content-container > .content-pane{
     display: inline;
 }
 
-.content-list {
+.swipe-content-list {
     position: relative;
     white-space: nowrap;
     overflow: visible;
