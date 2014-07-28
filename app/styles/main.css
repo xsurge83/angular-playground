@@ -61,33 +61,36 @@
 }
 
 /* change go-right to slide */
-.go-right > .tab-pane.ng-hide-remove{
+.go-right > .content-pane.ng-hide-remove {
     left : -100%;
 }
 
-.go-right > .tab-pane.ng-hide-remove.ng-hide-remove-active{
+.go-right > .content-pane.ng-hide-remove.ng-hide-remove-active {
     left: 0px;
 }
 
-.go-right > .tab-pane.ng-hide-add.ng-hide-add-active{
+.go-right > .content-pane.ng-hide-add.ng-hide-add-active {
     left: 100%;
 }
 
-.go-left > .tab-pane.ng-hide-remove{
+.go-left > .content-pane.ng-hide-remove {
     left : 100%;
 }
 
-.go-left > .tab-pane.ng-hide-remove.ng-hide-remove-active{
+.go-left > .content-pane.ng-hide-remove.ng-hide-remove-active {
     left: 0px;
 }
-
-.go-left > .tab-pane.ng-hide-add.ng-hide-add-active{
+.go-left > .content-pane.ng-hide-add {
+    left: 0px;
+}
+.go-left > .content-pane.ng-hide-add.ng-hide-add-active{
     left: -100%;
 }
 
-.tab-pane.ng-hide-remove, .tab-pane.ng-hide-add {
+.content-pane.ng-hide-remove, .content-pane.ng-hide-add {
     transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) .5s;
     display: block !important;
+    position: absolute;
 }
 
 
