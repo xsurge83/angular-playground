@@ -2,9 +2,10 @@
 (function (angular) {
 
   function NavSwipeCtrl($scope) {
-    var _panes = $scope.panes = [],
-      _currentIndex = 0;
+    var _panes = $scope.panes = [];
+    $scope.currentIndex = 0;
     $scope.direction = 'go-right';
+
 
     /***
      *
@@ -17,23 +18,23 @@
       }
       if (pane) {
         selectedIndex = _panes.indexOf(pane);
-        $scope.direction = selectedIndex < _currentIndex ? 'go-right' : 'go-left';
+        $scope.direction = selectedIndex < $scope.currentIndex ? 'go-right' : 'go-left';
 
         angular.forEach(_panes, function (pane) {
           pane.selected = false;
         });
 
         pane.selected = true;
-        _currentIndex = selectedIndex;
+        $scope.currentIndex = selectedIndex;
       }
     };
 
     $scope.swipeLeft = function () {
-      $scope.select(_currentIndex + 1)
+      $scope.select($scope.currentIndex + 1)
     };
 
     $scope.swipeRight = function () {
-      $scope.select(_currentIndex - 1);
+      $scope.select($scope.currentIndex - 1);
     };
 
     this.addPane = function (pane) {
@@ -52,39 +53,79 @@
       controller: 'NavSwipeCtrl',
       link: function (scope, element) {
 
-        var startX = 0, offsetX = 0;
-        var $swipeContentUl = element.find('.swipe-content-list');
+        var _startX = 0, _offsetX = 0;
+        var _containerWidth = element.find('.swipe-content-container')[0]
+          .getBoundingClientRect().width;
+        var _allPanesWidth = _containerWidth * (scope.panes.length - 1);
+
+        var $swipeContentListEl = element.find('.swipe-content-list');
+
+        scope.$watch('currentIndex', function (newValue, oldValue) {
+          var width;
+          if (newValue >= 0) {
+            width = getSwipeContentWidth();
+
+            if (newValue > oldValue) {
+              width = -width;
+            }
+            _offsetX += width;
+            performTranslateX(_offsetX, 1000);
+          }
+        });
+
+        function getSwipeContentWidth() {
+          var swipeContent = $swipeContentListEl.children()[0];
+          return swipeContent.getBoundingClientRect().width;
+        }
+
+        function performTranslateX(offsetX, duration) {
+
+          if (!angular.isDefined(duration)) {
+            duration = 1;
+          }
+          $swipeContentListEl
+            .velocity({ translateX: offsetX }, duration, "ease");
+        }
 
         function swipeStart(coords) {
-          if (!startX) {
-            startX = coords.x;
+          if (!_startX) {
+            _startX = coords.x;
           }
         }
 
         function swipeEnd(coords) {
           console.log('end ' + coords.x);
-          startX = 0;
+          _startX = 0;
+          var swipeWidth = getSwipeContentWidth();
+          var move = (scope.currentIndex) * swipeWidth;
+
           // todo: finish
         }
 
         function swipeMove(coords) {
-          var delta = coords.x - startX;
+          var delta = coords.x - _startX,
+            numOfPanes = scope.panes.length;
           if (delta > 2 || delta < -2) {
-            startX = coords.x;
-            offsetX += delta;
-            console.log('delta ' + delta);
 
-            $swipeContentUl
-              .velocity(
-              { translateX: offsetX},
-              10,
-              "ease"
-            );
+            // check for left and right limits
+            if ((_offsetX <= 0) &&
+
+              _offsetX > -(_allPanesWidth)) {
+              _startX = coords.x;
+              _offsetX += delta;
+
+              if (_offsetX > 0) {
+                _offsetX = 0;
+              } else if (_offsetX <= -(_allPanesWidth)) {
+                _offsetX = -_allPanesWidth + 1;
+              }
+              performTranslateX(_offsetX, 10);
+            }
+
           }
-
         }
 
-        $swipe.bind($swipeContentUl, {
+        $swipe.bind($swipeContentListEl, {
           start: swipeStart,
           move: swipeMove,
           end: swipeEnd,

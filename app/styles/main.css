@@ -45,6 +45,7 @@
     position: relative;
     white-space: nowrap;
     overflow: visible;
+    padding-left: 0;
 }
 
 .content-pane {
