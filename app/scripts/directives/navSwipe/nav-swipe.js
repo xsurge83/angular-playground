@@ -103,8 +103,8 @@
         }
 
         function swipeMove(coords) {
-          var delta = coords.x - _startX,
-            numOfPanes = scope.panes.length;
+          var delta = coords.x - _startX;
+
           if (delta > 2 || delta < -2) {
 
             // check for left and right limits
