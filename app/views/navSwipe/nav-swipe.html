@@ -1,0 +1,15 @@
+ <div class="tabbable">
+    <ul class="tabs">
+        <li ng-repeat="pane in panes" ng-class="{active:pane.selected}">
+            <a href="" ng-click="select(pane)">{{pane.title}}</a>
+        </li>
+    </ul>
+     <div class="swipe-content-container">
+         <ul class="swipe-content-list"
+             ng-swipe-left="swipeLeft()"
+             ng-swipe-right="swipeRight()"
+             ng-class="direction"
+             ng-transclude>
+             </ul>
+     </div>
+</div>
