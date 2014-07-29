@@ -52,30 +52,36 @@
       scope: {},
       controller: 'NavSwipeCtrl',
       link: function (scope, element) {
-
         var _startX = 0, _offsetX = 0;
         var _containerWidth = element.find('.swipe-content-container')[0]
           .getBoundingClientRect().width;
-        var _allPanesWidth = _containerWidth * (scope.panes.length - 1);
+        var _swipeAtContentOffset = _containerWidth/4;
+
+        var _maxOffsetX = _containerWidth * (scope.panes.length-1);
 
         var $swipeContentListEl = element.find('.swipe-content-list');
 
-        scope.$watch('currentIndex', function (newValue, oldValue) {
-          var width;
-          if (newValue >= 0) {
-            width = getSwipeContentWidth();
+        function swipeToNextIndex(newIndex, oldIndex){
+          var width = getSwipeContentWidth();
+          if (newIndex > oldIndex) {
+            width = -width;
+          }
+          _offsetX = width * newIndex;
+          performTranslateX(_offsetX, 1000);
+        }
 
-            if (newValue > oldValue) {
-              width = -width;
-            }
-            _offsetX += width;
-            performTranslateX(_offsetX, 1000);
+        scope.$watch('currentIndex', function (newValue, oldValue) {
+          if (newValue >= 0) {
+            swipeToNextIndex(newValue, oldValue);
           }
         });
 
+        /**
+         * Get swipe content - assumes all swipe content div are the same
+         * @returns {Number}
+         */
         function getSwipeContentWidth() {
-          var swipeContent = $swipeContentListEl.children()[0];
-          return swipeContent.getBoundingClientRect().width;
+          return $swipeContentListEl.children()[0].getBoundingClientRect().width;
         }
 
         function performTranslateX(offsetX, duration) {
@@ -88,6 +94,7 @@
         }
 
         function swipeStart(coords) {
+          console.log('start' + coords.x);
           if (!_startX) {
             _startX = coords.x;
           }
@@ -98,6 +105,10 @@
           _startX = 0;
           var swipeWidth = getSwipeContentWidth();
           var move = (scope.currentIndex) * swipeWidth;
+
+//          _offsetX =?
+
+
 
           // todo: finish
         }
@@ -110,14 +121,14 @@
             // check for left and right limits
             if ((_offsetX <= 0) &&
 
-              _offsetX > -(_allPanesWidth)) {
+              _offsetX > -(_maxOffsetX)) {
               _startX = coords.x;
               _offsetX += delta;
 
               if (_offsetX > 0) {
                 _offsetX = 0;
-              } else if (_offsetX <= -(_allPanesWidth)) {
-                _offsetX = -_allPanesWidth + 1;
+              } else if (_offsetX <= -(_maxOffsetX)) {
+                _offsetX = -_maxOffsetX + 1;
               }
               performTranslateX(_offsetX, 10);
             }
