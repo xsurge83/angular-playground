@@ -26,22 +26,16 @@
 
         pane.selected = true;
         $scope.currentIndex = selectedIndex;
+        $scope.swipeToNextIndex(selectedIndex);
       }
-    };
-
-    $scope.swipeLeft = function () {
-      $scope.select($scope.currentIndex + 1)
-    };
-
-    $scope.swipeRight = function () {
-      $scope.select($scope.currentIndex - 1);
     };
 
     this.addPane = function (pane) {
+      _panes.push(pane);
       if (_panes.length === 0) {
         $scope.select(pane);
       }
-      _panes.push(pane);
+
     };
   }
 
@@ -55,20 +49,20 @@
         var _startX = 0, _offsetX = 0;
         var _containerWidth = element.find('.swipe-content-container')[0]
           .getBoundingClientRect().width;
-        var _swipeAtContentOffset = _containerWidth/4;
 
-        var _maxOffsetX = _containerWidth * (scope.panes.length-1);
+        var _maxOffsetX = _containerWidth * (scope.panes.length - 1);
 
         var $swipeContentListEl = element.find('.swipe-content-list');
 
-        function swipeToNextIndex(newIndex, oldIndex){
-          var width = getSwipeContentWidth();
-          if (newIndex > oldIndex) {
-            width = -width;
+        scope.swipeToNextIndex = function swipeToNextIndex(newIndex, oldIndex) {
+          console.log('newIndex ' + newIndex, 'oldIndex ' + oldIndex);
+          var width;
+          if (newIndex !== oldIndex) {
+            width = getSwipeContentWidth();
+            _offsetX = -(width * newIndex);
+            performTranslateX(_offsetX, 1000);
           }
-          _offsetX = width * newIndex;
-          performTranslateX(_offsetX, 1000);
-        }
+        };
 
         scope.$watch('currentIndex', function (newValue, oldValue) {
           if (newValue >= 0) {
@@ -85,7 +79,7 @@
         }
 
         function performTranslateX(offsetX, duration) {
-
+          console.log('performTranslateX:offsetX ' + offsetX);
           if (!angular.isDefined(duration)) {
             duration = 1;
           }
@@ -94,45 +88,46 @@
         }
 
         function swipeStart(coords) {
-          console.log('start' + coords.x);
-          if (!_startX) {
-            _startX = coords.x;
-          }
+          _startX = coords.x;
         }
 
         function swipeEnd(coords) {
           console.log('end ' + coords.x);
-          _startX = 0;
-          var swipeWidth = getSwipeContentWidth();
-          var move = (scope.currentIndex) * swipeWidth;
+          var scrollDiff = _startX - coords.x;
+          var curMin = Math.round(-((scope.currentIndex) * _containerWidth));
+          var prevIndex = scope.currentIndex;
+          var offsetWithScroll = Math.round(_offsetX) - scrollDiff;
 
-//          _offsetX =?
+          if (offsetWithScroll <= curMin && _offsetX!==0) {
 
+            // go next
+            scope.select(scope.currentIndex + 1);
+          } else if (offsetWithScroll > curMin) {
 
+            // go prev
+            scope.select(scope.currentIndex - 1);
+          }
+          swipeToNextIndex(scope.currentIndex, prevIndex);
 
-          // todo: finish
         }
 
         function swipeMove(coords) {
-          var delta = coords.x - _startX;
+          var delta = Math.round(coords.x - _startX);
 
           if (delta > 2 || delta < -2) {
 
             // check for left and right limits
-            if ((_offsetX <= 0) &&
-
-              _offsetX > -(_maxOffsetX)) {
-              _startX = coords.x;
+            if ((_offsetX <= 0) && _offsetX >= -(_maxOffsetX)) {
+              _startX = Math.round(coords.x);
               _offsetX += delta;
 
               if (_offsetX > 0) {
                 _offsetX = 0;
               } else if (_offsetX <= -(_maxOffsetX)) {
-                _offsetX = -_maxOffsetX + 1;
+                _offsetX = -_maxOffsetX;
               }
               performTranslateX(_offsetX, 10);
             }
-
           }
         }
 
